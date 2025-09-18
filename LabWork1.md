@@ -44,6 +44,7 @@ ORDER BY list_price ASC
 
 ```sql
 SELECT name, size FROM production.product
+WHERE color = 'Black'
 ORDER BY list_price DESC
 LIMIT 3
 ```

@@ -135,7 +135,8 @@ WHERE title IS NULL
 ```sql
 SELECT name FROM production.product 
 WHERE name LIKE '__s%' OR name LIKE '__r%'
-
+```
+```sql
 SELECT name FROM production.product 
 WHERE name SIMILAR TO '__(s|r)%'
 ```

@@ -229,7 +229,7 @@ HAVING COUNT(*) > 1
 Найти и вывести на экран все номера чеков, на которые приходится более трех продуктов.
 
 ```sql
-SELECT reference_order_id, COUNT(*) FROM production.transaction_history_archive 
+SELECT reference_order_id, COUNT(*) FROM sales.sales_order_detail
 GROUP BY reference_order_id 
 HAVING COUNT(*) > 3
 ```
@@ -239,7 +239,7 @@ HAVING COUNT(*) > 3
 Найти и вывести на экран все номера продуктов, которые были куплены более трех раз.
 
 ```sql
-SELECT product_id FROM production.transaction_history_archive 
+SELECT product_id FROM sales.sales_order_detail
 GROUP BY product_id 
 HAVING COUNT(*) > 3
 ```
@@ -249,7 +249,7 @@ HAVING COUNT(*) > 3
 Найти и вывести на экран все номера продуктов, которые были куплены или три или пять раз.
 
 ```sql
-SELECT product_id FROM production.transaction_history_archive 
+SELECT product_id FROM sales.sales_order_detail
 GROUP BY product_id 
 HAVING COUNT(*) = 3 OR COUNT(*) = 5
 ```
@@ -270,6 +270,9 @@ HAVING COUNT(*) > 10
 Найти и вывести на экран номера товаров, которые всегда покупались в одном экземпляре за одну покупку.
 
 ```sql
+SELECT product_id FROM sales.sales_order_detail
+GROUP BY product_id
+HAVING MIN(order_qty) = 1 AND MAX(order_qty) = 1
 ```
 
 ### Задание 30
@@ -277,6 +280,10 @@ HAVING COUNT(*) > 10
 Найти и вывести на экран номер чека, SalesORDERID, на который приходится с наибольшим разнообразием товаров купленных на этот чек.
 
 ```sql
+SELECT sales_order_id FROM sales.sales_order_detail
+GROUP BY sales_order_id
+ORDER BY COUNT(DISTINCT product_id) DESC
+LIMIT 1
 ```
 
 ### Задание 31
@@ -284,6 +291,10 @@ HAVING COUNT(*) > 10
 Найти и вывести на экран номер чека, SalesORDERID с наибольшей суммой покупки, исходя из того, что цена товара – это UnitPrice, а количество конкретного товара в чеке – это ORDERQty.
 
 ```sql
+SELECT sales_order_id FROM sales.sales_order_detail
+GROUP BY sales_order_id
+ORDER BY SUM(unit_price * order_qty) DESC
+LIMIT 1
 ```
 
 ### Задание 32
@@ -312,6 +323,9 @@ ORDER BY COUNT(*) DESC
 Вывести на экран ProductID тех товаров, что всегда покупались в количестве более 1 единицы на один чек, при этом таких покупок было более двух.
 
 ```sql
+SELECT product_id FROM sales.sales_order_detail
+GROUP BY product_id
+HAVING MIN(order_qty) > 1 AND COUNT(*) > 2
 ```
 
 

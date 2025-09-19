@@ -231,8 +231,8 @@ HAVING COUNT(*) > 1
 Найти и вывести на экран все номера чеков, на которые приходится более трех продуктов.
 
 ```sql
-SELECT reference_order_id, COUNT(*) FROM sales.sales_order_detail
-GROUP BY reference_order_id 
+SELECT sales_order_id FROM sales.sales_order_detail
+GROUP BY sales_order_id
 HAVING COUNT(*) > 3
 ```
 
@@ -261,10 +261,10 @@ HAVING COUNT(*) = 3 OR COUNT(*) = 5
 Найти и вывести на экран все номера подкатегорий, в которым относится более десяти товаров.
 
 ```sql
-SELECT product_subcategory_id FROM production.product_subcategory
+SELECT product_subcategory_id FROM production.product
+WHERE product_subcategory_id IS NOT NULL
 GROUP BY product_subcategory_id
-HAVING COUNT(*) > 10
-Не уверен в решении 
+HAVING COUNT(*) >= 10
 ```
 
 ### Задание 29
@@ -329,5 +329,3 @@ SELECT product_id FROM sales.sales_order_detail
 GROUP BY product_id
 HAVING MIN(order_qty) > 1 AND COUNT(*) > 2
 ```
-
-

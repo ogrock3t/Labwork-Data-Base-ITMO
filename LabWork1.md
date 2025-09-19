@@ -79,8 +79,13 @@ WHERE name ILIKE 'L_N%'
 Найти и вывести на экран названия таких продуктов, которых начинаются либо на букву ‘D’, либо на букву ‘M’, и при этом длина имени – более трех символов.
 
 ```sql
-SELECT name, color FROM production.product 
-WHERE name SIMILAR TO '(D|L)%' AND LENGTH(name) > 3
+SELECT name FROM production.product 
+WHERE name SIMILAR TO '(D|M)%' AND LENGTH(name) > 3
+```
+
+```sql
+SELECT name FROM production.product
+WHERE (name ILIKE 'D%' OR name ILIKE 'M%') AND LENGTH(name) > 3
 ```
 
 ### Задание 10

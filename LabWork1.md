@@ -224,7 +224,7 @@ HAVING COUNT(*) > 5
 Найти и вывести на экран номера покупателей, CustomerID, у которых существует более одного чека, SalesORDERID, с одинаковой датой.
 
 ```sql
-SELECT customer_id FROM sales.sales_order_header
+SELECT DISTINCT customer_id FROM sales.sales_order_header
 GROUP BY customer_id, order_date
 HAVING COUNT(*) > 1
 ```

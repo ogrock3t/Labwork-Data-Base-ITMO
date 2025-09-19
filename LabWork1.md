@@ -267,7 +267,7 @@ HAVING COUNT(*) = 3 OR COUNT(*) = 5
 SELECT product_subcategory_id FROM production.product
 WHERE product_subcategory_id IS NOT NULL
 GROUP BY product_subcategory_id
-HAVING COUNT(*) >= 10
+HAVING COUNT(*) > 10
 ```
 
 ### Задание 29

@@ -26,7 +26,7 @@ SELECT A.name
 FROM production.product_subcategory as A
 
 JOIN production.product_subcategory as B
-ON A.product_subcategory_id = B.product_subcategory_id AND A.name != B.name
+ON A.product_subcategory_id != B.product_subcategory_id AND A.name = B.name
 ```
 
 ### Задание 3

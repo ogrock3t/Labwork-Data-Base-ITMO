@@ -8,7 +8,7 @@
   - 2-я попытка: −2  
   - 3-я попытка: −5  
 
-### 📝 [ЛР 2]((https://github.com/ogrock3t/Labwork-Data-Base-ITMO/blob/main/LabWork2.md)) 
+### 📝 [ЛР 2](https://github.com/ogrock3t/Labwork-Data-Base-ITMO/blob/main/LabWork2.md)
 - 🎯 Максимальный балл: **10**  
 - 📅 Дедлайн: **10.10.2025**  
 - ⚠️ Штрафы:  

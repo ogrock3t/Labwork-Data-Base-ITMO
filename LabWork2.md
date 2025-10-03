@@ -305,3 +305,13 @@ ON p.product_id = s.product_id
 GROUP BY p.size
 HAVING COUNT(p.name) > 10
 ```
+```sql
+select subcat.product_subcategory_id as subcategory_number 
+from
+production.product_subcategory as subcat
+join production.product as p
+on subcat.product_subcategory_id = p.product_subcategory_id
+group by subcat.product_subcategory_id
+order by count(distinct p.color) desc
+limit 1
+```

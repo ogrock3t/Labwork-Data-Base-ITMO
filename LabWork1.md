@@ -332,3 +332,30 @@ SELECT product_id FROM sales.sales_order_detail
 GROUP BY product_id
 HAVING MIN(order_qty) > 1 AND COUNT(*) > 2
 ```
+
+## Таски, которые были на защите
+
+```sql
+SELECT product_id FROM sales.sales_order_detail
+GROUP BY product_id
+HAVING COUNT(*) > 3
+```
+```sql
+SELECT color FROM production.product
+GROUP BY color
+HAVING COUNT(*) > 3 AND COUNT(*) < 5
+```
+
+```sql
+SELECT product_id FROM sales.sales_order_detail
+WHERE unit_price > 100
+GROUP BY product_id
+HAVING COUNT(*) > 3
+```
+
+```sql
+SELECT product_category_id FROM production.product_subcategory
+GROUP BY product_category_id
+ORDER BY COUNT(product_subcategory_id) DESC
+LIMIT 1
+```

@@ -326,3 +326,20 @@ having sod.unit_price > 100
 order by order_qty desc
 limit 1
 ```
+
+```sql
+SELECT p1.color, COUNT(*)
+FROM production.product AS p1
+JOIN production.product AS p2
+ON p1.product_id = p2.product_id
+WHERE p1.list_price > 50 AND p1.color IS NOT NULL
+GROUP BY p1.color
+```
+```sql
+SELECT p1.color, COUNT(p1.product_id)
+FROM production.product AS p1
+JOIN production.product AS p2
+ON p1.product_id = p2.product_id AND p1.color IS NOT NULL
+GROUP BY p1.color
+HAVING  COUNT(p1.product_id) > 1
+```

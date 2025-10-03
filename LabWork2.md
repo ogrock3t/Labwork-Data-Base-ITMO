@@ -263,3 +263,45 @@ FROM production.product AS A
 JOIN production.product as B
 ON A.name = B.name AND A.product_id <> B.product_id
 ```
+
+
+## Таски, которые были на защите
+
+```sql
+SELECT P.name
+FROM production.product as P
+
+JOIN sales.sales_order_detail as SOD
+ON P.product_id = SOD.product_id
+
+WHERE P.list_price > 100
+GROUP BY P.name
+HAVING SUM(SOD.order_qty) > 3
+```
+
+```sql
+SELECT p.product_id
+FROM production.product as p
+JOIN sales.sales_order_detail AS d
+ON p.product_id = d.product_id
+GROUP BY p.product_id
+HAVING MAX(order_qty) = 1
+```
+
+```sql
+SELECT ps.product_subcategory_id
+FROM production.product_subcategory AS ps
+JOIN production.product AS p
+ ON ps.product_subcategory_id = p.product_subcategory_id
+GROUP BY ps.product_subcategory_id
+HAVING COUNT(p.color = 'Red') >= 2;
+```
+
+```sql
+SELECT p.size
+FROM sales.sales_order_detail as s
+JOIN production.product as p
+ON p.product_id = s.product_id
+GROUP BY p.size
+HAVING COUNT(p.name) > 10
+```

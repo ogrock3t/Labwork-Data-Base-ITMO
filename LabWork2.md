@@ -315,3 +315,14 @@ group by subcat.product_subcategory_id
 order by count(distinct p.color) desc
 limit 1
 ```
+
+```sql
+select sod.product_id, p.name, count(sod.product_id) as order_qty
+from sales.sales_order_detail as sod
+join production.product as p
+  on sod.product_id = p.product_id
+group by sod.product_id, p.name, sod.unit_price
+having sod.unit_price > 100
+order by order_qty desc
+limit 1
+```

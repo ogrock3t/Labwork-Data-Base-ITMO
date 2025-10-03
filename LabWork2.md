@@ -210,6 +210,29 @@ GROUP BY V.name
 ORDER BY COUNT(PV.product_id) DESC
 LIMIT 3
 ```
+Если учитывать одинаковое количество товаров у разных поставщиков
+
+```sql
+SELECT V.name, COUNT(PV.product_id)
+FROM purchasing.vendor AS V
+
+JOIN purchasing.product_vendor AS PV
+ON V.business_entity_id = PV.business_entity_id
+
+GROUP BY V.business_entity_id, V.name
+HAVING COUNT(PV.product_id) >= (
+ SELECT MIN(counts)
+ FROM (
+  SELECT COUNT(DISTINCT product_id) AS counts
+  FROM purchasing.product_vendor
+  GROUP BY business_entity_id
+  ORDER BY counts DESC
+  LIMIT 3
+ ) AS top_3_counts
+)
+
+ORDER BY COUNT(PV.product_id) DESC;
+```
 
 ### Задание 15
 Найти для каждого поставщика количество подкатегорий продуктов, к которым относится продукты, поставляемые им, без учета ситуации, когда продукт не относится ни к какой подкатегории.

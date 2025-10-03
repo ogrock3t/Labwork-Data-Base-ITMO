@@ -183,7 +183,16 @@ GROUP BY V.credit_rating
 Найти первые 10 процентов самых дорогих товаров, с учетом ситуации, когда цены у некоторых товаров могут совпадать.
 
 ```sql
-
+SELECT DISTINCT P1.name, P1.list_price
+FROM production.product AS P1
+JOIN (
+ SELECT list_price
+ FROM production.product
+ ORDER BY list_price DESC
+ LIMIT 0.1 * (SELECT COUNT(*) FROM production.product)
+) AS P2
+ ON P1.list_price = P2.list_price
+ORDER BY P1.list_price DESC;
 ```
 
 ### Задание 14

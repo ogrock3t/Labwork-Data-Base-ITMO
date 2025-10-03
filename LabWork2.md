@@ -198,6 +198,7 @@ ORDER BY P1.list_price DESC;
 ### Задание 14
 Найти первых трех поставщиков, отсортированных по количеству поставляемых товаров, с учетом ситуации, что количество поставляемых товаров может совпадать для разных поставщиков.
 
+Адекватное решение
 ```sql
 SELECT V.name
 FROM purchasing.vendor as V
@@ -205,11 +206,8 @@ FROM purchasing.vendor as V
 JOIN purchasing.product_vendor as PV
 ON V.business_entity_id = PV.business_entity_id
 
-JOIN production.product as P
-ON PV.product_id = P.product_id
-
 GROUP BY V.name
-ORDER BY COUNT(P.product_id) DESC
+ORDER BY COUNT(PV.product_id) DESC
 LIMIT 3
 ```
 

@@ -68,7 +68,7 @@ FROM production.product as P
 JOIN production.product_subcategory as PSC
 ON P.product_subcategory_id = PSC.product_subcategory_id
 
-GROUP BY PSC.name, P.product_id
+GROUP BY PSC.product_subcategory_id
 ORDER BY COUNT(*) DESC
 LIMIT 3
 ```

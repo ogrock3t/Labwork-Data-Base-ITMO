@@ -307,7 +307,19 @@ GROUP by customer_id
 
 
 ```sql
+WITH customer_buyings (customer_id, product_id, buyings_number) AS (
+ SELECT soh.customer_id AS customer_id, sod.product_id AS product_id, COUNT(*) AS buyings_number
+ FROM sales.sales_order_header AS soh
+ JOIN sales.sales_order_detail AS sod
+ ON soh.sales_order_id = sod.sales_order_id
+ GROUP BY soh.customer_id, sod.product_id
+)
 
+SELECT t1.customer_id, t1.product_id, t1.buyings_number / (
+ SELECT SUM(t2.buyings_number) FROM customer_buyings AS t2
+ WHERE t1.customer_id = t2.customer_id
+)
+FROM customer_buyings AS t1
 ```
 
 ### Задание 17
@@ -410,7 +422,7 @@ FROM sales.sales_order_header AS SOH
 GROUP BY customer_id
 ```
 
-Айди чеков у которых есть товары которые относится к двум разным подкатегориям
+Айди чеков у которых есть товары которые относится к двум разным подкатегориям (можно ОТВ)
 
 ```sql
 WITH sales_info (sales_order_id, subcategory_count) AS (
@@ -447,4 +459,73 @@ WHERE product_id IN (
   WHERE SOD.sales_order_id = SOH.sales_order_id
  )) >= 3
 )
+```
+
+Вывести имена категорий, в которых как минимум 3 товара с цветом Red
+
+```sql
+SELECT name
+FROM production.product_category
+
+WHERE product_category_id IN (
+	SELECT product_category_id
+	FROM production.product_subcategory
+
+	WHERE product_subcategory_id IN (
+		SELECT product_subcategory_id
+		FROM production.product
+		WHERE color = 'Red'
+	
+		GROUP BY product_subcategory_id
+		HAVING COUNT(*) >= 3
+	)
+)
+```
+
+Найдите для каждого покупателя количество категорий и подкатегорий товарова которые встречаются в его чеке
+
+```sql
+WITH customer_info (customer_id, subcat_count, cat_count) AS (
+	SELECT SOH.customer_id,
+		COUNT (DISTINCT P.product_subcategory_id),
+		COUNT (DISTINCT PS.product_category_id)
+	FROM sales.sales_order_header AS SOH
+	JOIN sales.sales_order_detail AS SOD
+		ON SOH.sales_order_id = SOD.sales_order_id
+	JOIN production.product AS P
+		ON P.product_id = SOD.product_id
+	JOIN production.product_subcategory AS PS
+		ON P.product_subcategory_id = PS.product_subcategory_id
+	GROUP BY SOH.customer_id
+)
+
+
+SELECT customer_id, cat_count, subcat_count
+FROM customer_info
+```
+
+Вывести название категории с наибольшим количеством товаров
+
+```sql
+
+```
+
+
+Найти номера чеков, таких что покупатели, к которым относятся данные чеки, ходили в магазин более 3 раз (имеют более 3 чеков)
+
+```sql
+
+```
+
+Для каждого покупателя, покупавшего товары как минимум из половины категорий выведите следующую информацию: номер покупателя, количество чеков, среднее количество товаров в чеке
+
+```sql
+
+```
+
+
+Найти покупателя, который не покупал один и тот же товар дважды
+
+```sql
+
 ```

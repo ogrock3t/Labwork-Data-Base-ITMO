@@ -506,26 +506,118 @@ FROM customer_info
 
 Вывести название категории с наибольшим количеством товаров
 
+Не работает почему-то
 ```sql
+SELECT name
+FROM production.product_category
 
+WHERE product_category_id = (
+	SELECT product_category_id
+	FROM production.product_subcategory
+
+	WHERE product_subcategory_id = (
+		SELECT product_subcategory_id
+		FROM production.product
+	
+		GROUP BY product_subcategory_id
+		ORDER BY COUNT(*) DESC
+		LIMIT 1
+	)
+)
+```
+
+```sql
+SELECT PC.name, (
+	SELECT COUNT(*)
+	FROM production.product AS P
+	WHERE P.product_subcategory_id IN (
+		SELECT PS.product_subcategory_id
+		FROM production.product_subcategory AS PS
+
+		WHERE PS.product_category_id = PC.product_category_id
+	)
+)
+FROM production.product_category AS PC
+ORDER BY PC.name DESC
+LIMIT 1
 ```
 
 
 Найти номера чеков, таких что покупатели, к которым относятся данные чеки, ходили в магазин более 3 раз (имеют более 3 чеков)
 
 ```sql
+SELECT sales_order_id
+FROM sales.sales_order_header
+WHERE customer_id IN (
+	SELECT customer_id
+	FROM sales.sales_order_header
 
+	GROUP BY customer_id
+	HAVING COUNT(*) > 3
+)
 ```
 
 Для каждого покупателя, покупавшего товары как минимум из половины категорий выведите следующую информацию: номер покупателя, количество чеков, среднее количество товаров в чеке
 
 ```sql
+WITH customer_buyings (customer_id, product_id, buyings_number) AS (
+ SELECT soh.customer_id AS customer_id, sod.product_id AS product_id, COUNT(*) AS buyings_number
+ FROM sales.sales_order_header AS soh
+ JOIN sales.sales_order_detail AS sod
+ ON soh.sales_order_id = sod.sales_order_id
+ GROUP BY soh.customer_id, sod.product_id
+)
 
+SELECT t1.customer_id, t1.product_id, t1.buyings_number / (
+ SELECT SUM(t2.buyings_number) FROM customer_buyings AS t2
+ WHERE t1.customer_id = t2.customer_id
+)
+FROM customer_buyings AS t1
 ```
 
 
-Найти покупателя, который не покупал один и тот же товар дважды
+Найти покупателя, который не покупал один и тот же товар дважды. БЕЗ JOIN
 
 ```sql
+SELECT SOH1.customer_id
+FROM sales.sales_order_header AS SOH1
+WHERE NOT EXISTS (
+	SELECT 1
+	FROM sales.sales_order_detail AS SOD1
 
+	WHERE EXISTS (
+		SELECT 1
+		FROM sales.sales_order_detail AS SOD2
+
+		WHERE SOD1.product_id = SOD2.product_id
+		AND SOD1.sales_order_id != SOD2.sales_order_id
+		AND (
+			SELECT SOH2.customer_id
+			FROM sales.sales_order_header AS SOH2
+
+			WHERE SOH2.sales_order_id = SOD2.sales_order_id
+		) = SOH1.customer_id
+	)
+)
+
+GROUP BY customer_id
+```
+
+Найти для каждого продукта и каждого покупателя соотношение количества фактов покупки данного товара данным покупателем к общему количеству фактов покупки товаров данным покупателем (16 таска)
+
+
+```sql
+WITH customer_buyings (customer_id, product_id, buyings_number) AS (
+ SELECT soh.customer_id AS customer_id, sod.product_id AS product_id, COUNT(*) AS buyings_number
+ FROM sales.sales_order_header AS soh
+ JOIN sales.sales_order_detail AS sod
+ ON soh.sales_order_id = sod.sales_order_id
+ GROUP BY soh.customer_id, sod.product_id
+)
+
+SELECT t1.customer_id, t1.product_id, t1.buyings_number / (
+ SELECT SUM(t2.buyings_number) FROM customer_buyings AS t2
+ WHERE t1.customer_id = t2.customer_id
+)
+FROM customer_buyings AS t1
 ```

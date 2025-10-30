@@ -504,44 +504,26 @@ SELECT customer_id, cat_count, subcat_count
 FROM customer_info
 ```
 
-Вывести название категории с наибольшим количеством товаров
+Вывести название категории с наибольшим количеством товаров. БЕЗ JOIN
 
-Не работает почему-то
 ```sql
 SELECT name
 FROM production.product_category
 
 WHERE product_category_id = (
 	SELECT product_category_id
-	FROM production.product_subcategory
+	FROM production.product_subcategory AS PS
 
-	WHERE product_subcategory_id = (
-		SELECT product_subcategory_id
-		FROM production.product
-	
-		GROUP BY product_subcategory_id
-		ORDER BY COUNT(*) DESC
-		LIMIT 1
-	)
+	GROUP BY product_category_id
+	ORDER BY SUM((
+		SELECT COUNT(*)
+		FROM production.product AS P
+
+		WHERE P.product_subcategory_id = PS.product_subcategory_id
+	)) DESC
+	LIMIT 1
 )
 ```
-
-```sql
-SELECT PC.name, (
-	SELECT COUNT(*)
-	FROM production.product AS P
-	WHERE P.product_subcategory_id IN (
-		SELECT PS.product_subcategory_id
-		FROM production.product_subcategory AS PS
-
-		WHERE PS.product_category_id = PC.product_category_id
-	)
-)
-FROM production.product_category AS PC
-ORDER BY PC.name DESC
-LIMIT 1
-```
-
 
 Найти номера чеков, таких что покупатели, к которым относятся данные чеки, ходили в магазин более 3 раз (имеют более 3 чеков)
 
@@ -598,6 +580,29 @@ WHERE NOT EXISTS (
 			WHERE SOH2.sales_order_id = SOD2.sales_order_id
 		) = SOH1.customer_id
 	)
+)
+
+GROUP BY customer_id
+```
+
+```sql
+SELECT SOH1.customer_id
+FROM sales.sales_order_header AS SOH1
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM sales.sales_order_detail AS SOD1,
+         sales.sales_order_header AS SOH2
+    WHERE SOD1.sales_order_id = SOH2.sales_order_id
+      AND SOH2.customer_id = SOH1.customer_id
+      AND EXISTS (
+          SELECT 1
+          FROM sales.sales_order_detail AS SOD2,
+               sales.sales_order_header AS SOH3
+          WHERE SOD2.sales_order_id = SOH3.sales_order_id
+            AND SOH3.customer_id = SOH1.customer_id
+            AND SOD2.product_id = SOD1.product_id
+            AND SOD1.sales_order_detail_id != SOD2.sales_order_detail_id
+      )
 )
 
 GROUP BY customer_id

@@ -26,7 +26,7 @@
   - 3-я попытка: −3  
   - 4-я попытка: −6  
 
-### 📝 [ЛР 4]((https://github.com/ogrock3t/Labwork-Data-Base-ITMO/blob/main/LabWork4.md))
+### 📝 [ЛР 4](https://github.com/ogrock3t/Labwork-Data-Base-ITMO/blob/main/LabWork4.md)
 - 🎯 Максимальный балл: **12**  
 - 📅 Дедлайн: **07.11.2025**  
 - ⚠️ Штрафы:  

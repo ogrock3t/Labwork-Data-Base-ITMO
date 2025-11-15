@@ -112,3 +112,23 @@ FROM (
 ORDER BY sales_count DESC
 LIMIT 5
 ```
+
+Вывести продуктовое имя, имя категории, листовой прайс, и сумму продаж всех товаров этой категории до выхода этого товара в продажу
+
+```sql
+SELECT
+    p.name AS product_name,
+    pc.name AS category_name,
+    p.list_price,
+    SUM(sod.line_total) OVER (
+        PARTITION BY pc.product_category_id
+        ORDER BY p.sell_start_date
+        ROWS UNBOUNDED PRECEDING
+    ) AS category_sales_before_product
+FROM production.product p
+JOIN production.product_subcategory ps ON p.product_subcategory_id = ps.product_subcategory_id
+JOIN production.product_category pc ON ps.product_category_id = pc.product_category_id
+JOIN sales.sales_order_detail sod ON p.product_id = sod.product_id
+JOIN sales.sales_order_header soh ON sod.sales_order_id = soh.sales_order_id
+WHERE soh.order_date <= p.sell_start_date
+```

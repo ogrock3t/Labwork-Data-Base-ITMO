@@ -45,23 +45,26 @@ db.sales_sales_order_headers.find({
 Вывести список названий товаров и их количество (Quantity) в заказах (коллекции sales_sales_order_details и prod_products).
 
 ```
-db.sales_sales_order_details.aggregate([ 
-  { 
-    $lookup: { 
-      from: "prod_products", 
-      localField: "product_id", 
-      foreignField: "product_id", 
-      as: "info" }}, 
-      { 
-        $unwind: "$info" 
-      }, 
-      { 
-        $project: { 
-          name: "prod_product",
-          quantity: "order_qty" 
-        } 
-  }]
-)
+db.sales_sales_order_details.aggregate([
+    {
+        $lookup: {
+            from: "prod_products",
+            localField: "product_id",
+            foreignField: "product_id",
+            as: "product"
+        }
+    },
+    {
+        $unwind: "$product"
+    },
+    {
+        $project: {
+            _id: 0,
+            name: "$product.name",
+            quantity: "$order_qty"
+        }
+    }
+])
 ```
 
 ### Задание 4

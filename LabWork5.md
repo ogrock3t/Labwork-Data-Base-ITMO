@@ -177,9 +177,12 @@ db.prod_products.aggregate([
 Вывести список заказов, в которых купили более 5 единиц одного товара (коллекция sales_sales_order_details).
 
 ```
-db.sales_sales_order_details.find({
-  order_qty: { $gt: 5 }
-})
+db.sales_sales_order_details.distinct(
+    "sales_order_id",
+    {
+        order_qty: { $gt: 5 }
+    }
+)
 ```
 
 ### Задание 10

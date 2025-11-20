@@ -72,13 +72,14 @@ db.sales_sales_order_details.aggregate([
 
 ```
 db.hr_employees.aggregate([
-	{
-		$project: {
-			job_title: "$job_title",
-      hire_date: "$hire_date",
-      employee_pay_history: "$employee_pay_history.rate"
-		}
-	}
+    {
+        $project: {
+            _id: 0,
+            job_title: "$job_title",
+            hire_date: "$hire_date",
+            employee_pay_history: { $sum: "$employee_pay_history.rate" }
+        }
+    }
 ])
 ```
 

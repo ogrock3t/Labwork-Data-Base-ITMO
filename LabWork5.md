@@ -35,13 +35,10 @@ db.prod_products.aggregate([
 
 ```
 db.sales_sales_order_headers.find({
-  $expr: {
-    $eq: [ {
-      year: "$order_date" 
-      }, 2012 ] 
+    $expr: {
+        $eq: [ { $year: "$order_date" }, 2012 ]
     }
-    }
-)
+})
 ```
 
 ### Задание 3

@@ -4,29 +4,29 @@
 Показать все названия товаров из подкатегории Mountain Bikes (коллекции prod_products и prod_product_subcategories).
 
 ```
-db.prod_products.aggregate([
-  {
-    $lookup: {
-      from: "prod_product_subcategories",
-      localField: "product_subcategory_id",
-      foreignField: "_id",           
-      as: "subcategory"
+db.prod_product_subcategories.aggregate([
+    {
+        $match: {
+            name: "Mountain Bikes"
+        }
+    },
+    {
+        $lookup: {
+            from: "prod_products",
+            localField: "product_subcategory_id",
+            foreignField: "product_subcategory_id",
+            as: "product"
+        }
+    },
+    {
+        $unwind: "$product"
+    },
+    {
+        $project: {
+            _id: 0,
+            product_name: "$product.name"
+        }
     }
-  },
-  {
-    $unwind: "$subcategory"
-  },
-  {
-    $match: {
-      "subcategory.name": "Mountain Bikes"
-    }
-  },
-  {
-    $project: {
-      _id: 0,
-      name: "$name"
-    }
-  }
 ])
 ```
 

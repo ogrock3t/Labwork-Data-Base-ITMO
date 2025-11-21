@@ -325,3 +325,44 @@ db.prod_products.find({
   sell_start_date: { $gt: ISODate("2013-05-31T23:59:59Z") }
 }).sort( { size: 1 } )
 ```
+
+Вывести названия красных товаров без размера, упорядочив по modified_date.
+```
+db.prod_products.aggregate([
+    {
+        $match: {
+            color: "Red",
+            size: { $eq: null }
+        }
+    },
+    {
+        $sort: { modified_date: 1 }
+    },
+    {
+        $project: {
+            _id: 0,
+            name: 1,
+            modified_date: 1
+        }
+    }
+])
+```
+
+Вывести количество товаров в каждой подкатегории.
+```
+db.prod_products.aggregate([
+    {
+        $group: {
+            _id: "$product_subcategory_id",
+            total_products: { $sum : 1 }
+        }
+    },
+    {
+        $project: {
+            _id: 0,
+            product_subcategory_id: "$_id",
+            total_products: 1
+        }
+    }
+])
+```

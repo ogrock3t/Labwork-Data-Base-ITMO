@@ -223,3 +223,105 @@ db.hr_employees.find({
   $expr: { $eq: [ { $month: "$birth_date" }, 11 ] }
 })
 ```
+
+## Таски, которые были на защите
+
+Вывести продукты, у которых есть подкатегория и отсортировать.
+```
+db.prod_products.find(
+  {
+    product_subcategory_id: { $ne: null }
+  },
+  {
+    _id: 0,
+    product_subcategory_id: 1,
+    name: 1
+  }
+).sort({ name: 1 })
+```
+
+Вывести товары, таких что товаров этого размера больше 10.
+```
+db.prod_products.aggregate([
+  {
+    $match: {
+      size: { $ne: null }
+    }
+  },
+  {
+    $group: {
+      _id: "$size",
+      counter: { $sum: 1 }
+    }
+  },
+  {
+    $match: {
+      counter: { $gt: 10 }
+    }
+  },
+  {
+    $project: {
+     _id: 0,
+      size: "$_id",
+      counter: 1
+    }
+  }
+])
+```
+
+3 первых товара с наибольшим количеством продаж.
+```
+db.sales_sales_order_details.aggregate([
+    {
+        $group: {
+            _id: "$product_id",
+            count: {$sum: "$order_qty"}
+        }
+    },
+    {
+        $sort: {
+            count: -1
+        }
+    },
+    {
+        $limit: 3
+    }
+])
+```
+
+Вывести товары которые ни разу не продавались.
+```
+db.prod_products.aggregate([
+  {
+    $lookup: {
+        from: "sales_sales_order_details",
+        localField: "_id",
+        foreignField: "product_id",
+        as: "sales"
+    }
+  },
+  {
+    $match: { sales: { $eq: [] } }
+  },
+  {
+    $project: {
+        _id: 0,
+        name: 1
+    }
+  }
+])
+```
+
+Товары у которых цена менялась больше 1 раза.
+```
+db.prod_products.find({
+  $expr: { $gt: [ { $size: "$product_cost_history" }, 1 ] }
+})
+```
+
+Вывести товары, которые начали продаваться после мая 2013.
+```
+db.prod_products.find({
+  sell_start_date: { $gt: ISODate("2013-05-31T23:59:59Z") }
+}).sort( { size: 1 } )
+```

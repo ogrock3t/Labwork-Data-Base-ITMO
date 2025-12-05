@@ -151,3 +151,72 @@ FOR lex IN Lexeme
     degree: degree
   }
 ```
+
+## Таски, которые были на защите
+
+Найти все лексемы, у которых 'pageid' не равен 1000. Вывести их леммы и 'padeid'
+
+```
+FOR lex IN Lexeme
+  FILTER lex.pageid != 1000
+  RETURN {
+    lemma: lex.lemma,
+    pageid: lex.pageid
+  }
+```
+
+Найти все категории и для каждой категории. Вывести ее название и среднее количество форм на лексему в этой категории.
+```
+FOR cat IN Category
+  LET lexemes = (
+    FOR lex IN 1..1 INBOUND cat HAS_CATEGORY
+      RETURN lex
+  )
+  LET formsCounts = (
+    FOR lex IN lexemes
+      RETURN LENGTH(
+        FOR form IN 1..1 OUTBOUND lex HAS_FORM
+          RETURN 1
+      )
+  )
+  RETURN {
+    category: cat.name,
+    avg_forms: AVG(formsCounts)
+  }
+```
+
+Найти все лексемы и для каждой вычислить "плотность связей" (отношение общего количества связей к сумме количества форм и значений). Вывести топ 10 лексем с наибольшей плотностью связей, их леммы, количество форм, количество значений, общее количество связей и значение плотности
+```
+FOR lex IN Lexeme
+  LET formsCount = LENGTH(
+    FOR form IN 1..1 OUTBOUND lex HAS_FORM
+      RETURN 1
+  )
+
+  LET sensesCount = LENGTH(
+    FOR sense IN 1..1 OUTBOUND lex HAS_SENSE
+      RETURN 1
+  )
+
+  LET totalEdges = LENGTH(
+    FOR v IN 1..1 OUTBOUND lex HAS_FORM, HAS_SENSE, HAS_CATEGORY, IN_LANGUAGE, HAS_CLAIM
+      RETURN 1
+  ) + LENGTH(
+    FOR v IN 1..1 INBOUND lex HAS_FORM, HAS_SENSE, HAS_CATEGORY, IN_LANGUAGE, HAS_CLAIM
+      RETURN 1
+  )
+
+  LET denom = formsCount + sensesCount
+  LET density = totalEdges / (denom == 0 ? 1 : denom)
+
+  SORT density DESC
+  LIMIT 10
+
+  RETURN {
+    lemma: lex.lemma,
+    formsCount: formsCount,
+    sensesCount: sensesCount,
+    totalEdges: totalEdges,
+    density: density
+  }
+```

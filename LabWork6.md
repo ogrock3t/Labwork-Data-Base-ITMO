@@ -296,3 +296,42 @@ for cat in Category
           lexemes_count: lex_count
     }
 ```
+
+Найти все лексемы с леммой "дом".
+```
+FOR l IN Lexeme
+  FILTER l.lemma == 'дом'
+  RETURN {
+    id: l.lexeme_id,
+    lemma: l.lemma
+  }
+```
+
+Найти все лексемы из категории "Q1084", у которых есть хотя бы одно значение.
+```
+FOR c IN Category
+  FILTER c.category_id == 'Q1084'
+  FOR l IN Lexeme
+    LET s_cnt = LENGTH(FOR s IN OUTBOUND l HAS_SENSE RETURN 1)
+    FILTER s_cnt > 0
+    RETURN l.lemma
+```
+
+Найти все лексемы, у которых одновременно больше 5 форм и больше 3 значений, вывести лемму, количество форм, количество значений, категорию, все формы в текстовом представлении.
+```
+FOR l IN Lexeme
+  LET s_cnt = LENGTH(FOR s IN OUTBOUND l HAS_SENSE RETURN 1)
+  let forms = (FOR f IN OUTBOUND l HAS_FORM RETURN f.representation)
+  LET f_cnt = LENGTH(forms)
+  
+  LET cat = (FOR c IN OUTBOUND l HAS_CATEGORY RETURN c)
+  
+  FILTER s_cnt > 3 AND f_cnt > 5
+  RETURN {
+    lemma: l.lemma,
+    form_count: f_cnt,
+    sense_count: s_cnt,
+    category: cat[0].name,
+    forms: forms
+  }
+```

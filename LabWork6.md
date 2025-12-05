@@ -264,3 +264,35 @@ FOR lex IN Lexeme
     forms: forms
   }
 ```
+
+Найти все лексемы из языка Q7737, отсортировать по возрастанию леммы и вывести леммы
+```
+for lex in 1..1 inbound "Language/Q7737" IN_LANGUAGE
+  sort lex.lemma asc
+  return lex.lemma
+```
+
+Найти все лексемы из языка Q7737, вывести их леммы и категории, убрать дубликаты
+```
+for lex in 1..1 inbound "Language/Q7737" IN_LANGUAGE
+  for cat in 1..1 outbound lex HAS_CATEGORY
+    return distinct {lemma: lex.lemma, category: cat.name}
+```
+
+Найдите лексемы, которые имеют наибольшее количество связей в своей категории. Выведите их леммы, количество связей, имя категории и количество лексем в этой категории
+```
+for cat in Category
+  let ml = max(for lex in 1..1 inbound cat HAS_CATEGORY
+      return length(for neigh in 1..1 any lex HAS_FORM, HAS_SENSE, IN_LANGUAGE, HAS_CATEGORY, HAS_CLAIM return 1))
+  let lex_count = length(for lex in 1..1 inbound cat HAS_CATEGORY
+      return 1)
+  let good_names = (for lex in 1..1 outbound cat HAS_CATEGORY
+        filter length(for neigh in 1..1 any lex HAS_FORM, HAS_SENSE, IN_LANGUAGE, HAS_CATEGORY, HAS_CLAIM 
+        return 1) == ml
+      return lex.name)
+  return {lemma: good_names[0], 
+          cat_name: cat.name,
+          count_edges: ml,
+          lexemes_count: lex_count
+    }
+```

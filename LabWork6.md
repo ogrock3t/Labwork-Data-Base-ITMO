@@ -220,3 +220,47 @@ FOR lex IN Lexeme
     density: density
   }
 ```
+
+Найти лексемы с леммой "дом", вывести их леммы и lexeme_id.
+```
+FOR lex IN Lexeme
+  FILTER lex.lemma == "дом"
+  RETURN {
+    lemma: lex.lemma,
+    lexeme_id: lex.lexeme_id
+  }
+```
+
+Найти все лексемы из категории Q1084, у которых есть хотя бы 1 значение. Вывести их леммы и количество значений.
+```
+FOR lex IN 1..1 INBOUND "Category/Q1084" HAS_CATEGORY
+  LET senseCount = LENGTH(
+    FOR sense IN 1..1 OUTBOUND lex HAS_SENSE
+      RETURN 1
+  )
+  FILTER senseCount > 0
+  RETURN {
+    lemma: lex.lemma,
+    senseCount: senseCount
+  }
+```
+
+Найти все лексемы, у которых более 5 форм и более 3 значений одновременно. Для каждой лексемы вывести лемму, количество форм, количество значений и все формы (массив репрезентаций form.representation).
+```
+FOR lex IN Lexeme
+  LET forms = (
+    FOR form IN 1..1 OUTBOUND lex HAS_FORM
+      RETURN form.representation
+  )
+  LET sensesCount = LENGTH(
+    FOR sense IN 1..1 OUTBOUND lex HAS_SENSE
+      RETURN 1
+  )
+  FILTER LENGTH(forms) > 5 AND sensesCount > 3
+  RETURN {
+    lemma: lex.lemma,
+    formsCount: LENGTH(forms),
+    sensesCount: sensesCount,
+    forms: forms
+  }
+```

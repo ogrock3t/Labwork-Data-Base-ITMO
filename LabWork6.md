@@ -335,3 +335,49 @@ FOR l IN Lexeme
     forms: forms
   }
 ```
+
+Найти все лексемы с type 'lexeme'. Вывести все lexeme_id. Вывести первые 20 штук.
+
+```
+FOR lex IN Lexeme
+  FILTER lex.type == "lexeme"
+  LIMIT 20
+  RETURN lex.lexeme_id
+```
+  
+Найти все лексемы, которые имеют значение с толкованием содержащим подстроку "жилище". Вывести все их леммы и количество таких значений.
+
+```
+FOR sense IN Sense
+  FILTER CONTAINS(sense.gloss, "жилище")
+  FOR lex IN 1..1 INBOUND sense HAS_SENSE
+    COLLECT lemma = lex.lemma INTO sensesGroup
+    RETURN {
+      lemma: lemma,
+      senses_count: LENGTH(sensesGroup)
+    }
+```    
+    
+Найти все лексемы которые связаны с более чем одной категорией (если такое возможно в структуре данных) или имеют свойства с разными 'property id'. Вывести лемму, количество различных категорий и свойств и список этих категорий/свойств.
+
+```
+FOR lex IN Lexeme
+  LET categories = UNIQUE(
+    FOR cat IN 1..1 OUTBOUND lex HAS_CATEGORY
+      RETURN { category_id: cat.category_id, name: cat.name }
+  )
+  LET properties = UNIQUE(
+    FOR prop IN 1..1 OUTBOUND lex HAS_CLAIM
+      RETURN { property_id: prop.property_id, name: prop.name }
+  )
+  LET categories_count = LENGTH(categories)
+  LET properties_count = LENGTH(properties)
+  FILTER categories_count > 1 OR properties_count > 1
+  RETURN {
+    lemma: lex.lemma,
+    categories_count: categories_count,
+    properties_count: properties_count,
+    categories: categories,
+    properties: properties
+  }
+  ```  

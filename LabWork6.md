@@ -286,7 +286,7 @@ for cat in Category
       return length(for neigh in 1..1 any lex HAS_FORM, HAS_SENSE, IN_LANGUAGE, HAS_CATEGORY, HAS_CLAIM return 1))
   let lex_count = length(for lex in 1..1 inbound cat HAS_CATEGORY
       return 1)
-  let good_names = (for lex in 1..1 outbound cat HAS_CATEGORY
+  let good_names = (for lex in 1..1 inbound cat HAS_CATEGORY
         filter length(for neigh in 1..1 any lex HAS_FORM, HAS_SENSE, IN_LANGUAGE, HAS_CATEGORY, HAS_CLAIM 
         return 1) == ml
       return lex.name)

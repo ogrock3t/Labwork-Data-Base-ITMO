@@ -53,7 +53,7 @@ FOR lex IN Lexeme
       RETURN 1
   )
   
-  SORT senseCount DESC
+  SORT formCount DESC
   LIMIT 10
   
   RETURN {

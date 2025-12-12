@@ -456,3 +456,26 @@ LET outboundCount = LENGTH(
         inbound: inboundCount
     }
 ```
+
+Вывести лексеммы, количество форм, количество сенсов, ее язык, категорию, степень вершины
+
+```
+FOR lex IN Lexeme
+  LET forms = LENGTH(FOR f IN 1..1 OUTBOUND lex HAS_FORM RETURN 1)
+  LET senses = LENGTH(FOR s IN 1..1 OUTBOUND lex HAS_SENSE RETURN 1)
+  
+  LET language = FIRST(FOR l IN 1..1 OUTBOUND lex IN_LANGUAGE RETURN l.name)
+  LET category = FIRST(FOR c IN 1..1 OUTBOUND lex HAS_CATEGORY RETURN c.name)
+  
+  LET outboundCount = LENGTH(FOR v IN 1..1 OUTBOUND lex HAS_FORM, HAS_SENSE, HAS_CATEGORY, IN_LANGUAGE, HAS_CLAIM RETURN 1)
+  
+  RETURN {
+    lemma: lex.lemma,
+    lexeme_id: lex.lexeme_id,
+    forms_count: forms,
+    senses_count: senses,
+    language: language,
+    category: category,
+    degree: outboundCount
+  }
+```

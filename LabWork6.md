@@ -380,4 +380,79 @@ FOR lex IN Lexeme
     categories: categories,
     properties: properties
   }
-  ```  
+  ```
+
+Найти все лексеммы русского языка (Q7737 язык), которе существительные (Q1084 категория) у которых есть хотя бы две формы и смысл 'предмет', вывести их леммы, найденные количества и все смыслы
+
+```
+FOR lex IN Lexeme
+    LET languageCheck = (
+        FOR lang IN 1..1 OUTBOUND lex IN_LANGUAGE
+            FILTER lang.language_id == 'Q7737'
+            RETURN 1
+    )
+    FILTER LENGTH(languageCheck) > 0
+
+    LET categoryCheck = (
+        FOR cat IN 1..1 OUTBOUND lex HAS_CATEGORY
+            FILTER cat.category_id == 'Q1084'
+            RETURN 1
+    )
+    FILTER LENGTH(categoryCheck) > 0
+
+    LET forms = (
+        FOR form IN 1..1 OUTBOUND lex HAS_FORM
+            RETURN form
+    )
+    LET formCount = LENGTH(forms)
+    FILTER formCount >= 2
+    
+    LET senses = (
+        FOR sense IN 1..1 OUTBOUND lex HAS_SENSE
+            RETURN sense
+    )
+    
+    LET hasSubjectSense = (
+        FOR sense IN senses
+            FILTER CONTAINS(sense.gloss, 'предмет')
+            LIMIT 1
+            RETURN 1
+    )
+    FILTER LENGTH(hasSubjectSense) > 0
+    
+    RETURN {
+        lemma: lex.lemma,
+        lexeme_id: lex.lexeme_id,
+        forms_count: formCount,
+        senses_count: LENGTH(senses),
+        all_forms: forms[*].representation,
+        all_senses: senses[*].gloss,
+    }
+```
+
+Найти все лексемы с максимальным количеством связей (степень вершины). Вывести топ-10 лексем с их леммами и количеством связей.
+
+```
+LET outboundCount = LENGTH(
+        FOR v IN 1..1 OUTBOUND lex HAS_FORM, HAS_SENSE, HAS_CATEGORY, IN_LANGUAGE, HAS_CLAIM
+            RETURN 1
+    )
+    
+    LET inboundCount = LENGTH(
+        FOR v IN 1..1 INBOUND lex HAS_FORM, HAS_SENSE, HAS_CATEGORY, IN_LANGUAGE, HAS_CLAIM
+            RETURN 1
+    )
+    
+    LET degree = outboundCount + inboundCount
+    
+    SORT degree DESC
+    LIMIT 10
+    
+    RETURN {
+        lexeme_id: lex.lexeme_id,
+        lemma: lex.lemma,
+        degree: degree,
+        outbound: outboundCount,
+        inbound: inboundCount
+    }
+```

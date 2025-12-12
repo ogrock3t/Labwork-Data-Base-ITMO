@@ -430,33 +430,6 @@ FOR lex IN Lexeme
     }
 ```
 
-Найти все лексемы с максимальным количеством связей (степень вершины). Вывести топ-10 лексем с их леммами и количеством связей.
-
-```
-LET outboundCount = LENGTH(
-        FOR v IN 1..1 OUTBOUND lex HAS_FORM, HAS_SENSE, HAS_CATEGORY, IN_LANGUAGE, HAS_CLAIM
-            RETURN 1
-    )
-    
-    LET inboundCount = LENGTH(
-        FOR v IN 1..1 INBOUND lex HAS_FORM, HAS_SENSE, HAS_CATEGORY, IN_LANGUAGE, HAS_CLAIM
-            RETURN 1
-    )
-    
-    LET degree = outboundCount + inboundCount
-    
-    SORT degree DESC
-    LIMIT 10
-    
-    RETURN {
-        lexeme_id: lex.lexeme_id,
-        lemma: lex.lemma,
-        degree: degree,
-        outbound: outboundCount,
-        inbound: inboundCount
-    }
-```
-
 Вывести лексеммы, количество форм, количество сенсов, ее язык, категорию, степень вершины
 
 ```
